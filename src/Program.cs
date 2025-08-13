@@ -1,2 +1,61 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+// DocHelper's purpose is to read files and produce an image diagram of the class hiararchies
+
+class DocHelper {
+
+    // classes: we want to save their name (key), their parents, fields, properties, events, and methods
+    Dictionary<string, DataClass>? _data_classes = new();
+    // enums: we want to save their name (key) and name of its constants
+    Dictionary<string, List<string>?>? _data_enums = new();
+
+    DocHelper() {
+
+    }
+
+    static void Main(string[] args) {
+
+        DocHelper docHelper = new DocHelper();
+
+        foreach(var a in args) {
+            Console.WriteLine(a);
+            docHelper.AnalyzeFile(a);
+        }
+
+    }
+
+    // parses file and navigates through descendants, saving relevant data.
+    private void AnalyzeFile(string path) {
+
+        if (!File.Exists(path) || !Path.GetExtension(path).Equals(".cs", StringComparison.OrdinalIgnoreCase)) return;
+
+        // read and parse
+        var code = File.ReadAllText(path);
+        var tree = CSharpSyntaxTree.ParseText(code);
+        var root = tree.GetRoot();
+
+        // check class nodes
+        foreach (var node in root.DescendantNodes().OfType<ClassDeclarationSyntax>()) {
+            Console.WriteLine($"class found: {node.Identifier.Text}");
+        }
+
+        
+        
+        
+    }
+
+}
+
+class DataClass {
+    public List<string>? Parents { get; set; }
+    public List<string>? Fields { get; set; }
+    public List<string>? Properties { get; set; }
+    public List<string>? Events { get; set; }
+    public List<string>? Methods {get; set; }
+}
+
