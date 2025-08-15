@@ -48,55 +48,31 @@ class ParserDoc {
                 
                 case ClassDeclarationSyntax cls:
 
-                    // ------------------- fields ------------------- //
+                    // ---------- save class members data ---------- //
                     
-                    var fields = cls.Members.OfType<FieldDeclarationSyntax>();
-                    List<string>? list_fields = [];
-                    foreach (var v in fields) {
-                        list_fields.Add(v.ToString());
-                    }
-
-                    // ----------------- properties ----------------- //
-                                            
-                    var properties = cls.Members.OfType<PropertyDeclarationSyntax>();
-                    List<string>? list_properties = [];
-                    foreach (var v in properties) {
-                        list_properties.Add(v.ToString());
-                    }
-
-                    // ------------------- events ------------------- //
+                    var list_parents = cls.BaseList?.Types.Select(t => t.Type.ToString()).ToList() ?? new List<string>();
+                    var list_fields = cls.Members.OfType<FieldDeclarationSyntax>().Select(t => t.ToString()).ToList();
+                    var list_properties = cls.Members.OfType<PropertyDeclarationSyntax>().Select(t => t.ToString()).ToList();
+                    var list_eventfields = cls.Members.OfType<EventFieldDeclarationSyntax>().Select(t => t.ToString()).ToList();
+                    var list_methods = cls.Members.OfType<MethodDeclarationSyntax>().Select(v => v
+                                .WithAttributeLists(default)
+                                .WithLeadingTrivia(SyntaxTriviaList.Empty)
+                                .WithBody(null)
+                                .WithExpressionBody(null)
+                                .WithConstraintClauses(default)
+                                .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                                .NormalizeWhitespace()
+                                .ToFullString()).ToList();
                     
-                    var eventfields = cls.Members.OfType<EventFieldDeclarationSyntax>();
-                    List<string>? list_eventfields = [];
-                    foreach (var v in eventfields) {
-                        list_eventfields.Add(v.ToString());
-                    }
-
-                    // ------------------ methods ------------------ //
-                    
-                    var methods = cls.Members.OfType<MethodDeclarationSyntax>();
-                    List<string>? list_methods = [];
-                    foreach (var v in methods) {
-                        var declaration_only = v
-                            .WithAttributeLists(default)
-                            .WithLeadingTrivia(SyntaxTriviaList.Empty)
-                            .WithBody(null)
-                            .WithExpressionBody(null)
-                            .WithConstraintClauses(default)
-                            .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
-                            .NormalizeWhitespace();
-                        list_methods?.Add(declaration_only.ToFullString());
-                    }
-
-                    // --------------- add class data --------------- //
+                    // ----------------- save data ----------------- //
 
                     DataClass data_class = new DataClass {
-                        Fields = list_fields,
+                        Parents    = list_parents,
+                        Fields     = list_fields,
                         Properties = list_properties,
-                        Events = list_eventfields,
-                        Methods = list_methods
+                        Events     = list_eventfields,
+                        Methods    = list_methods
                     };
-                    // save class data
                     _data_classes?.Add(cls.Identifier.Text, data_class);
                     break;
 
@@ -105,10 +81,7 @@ class ParserDoc {
                 // --------------------------------------------------------------------------------
 
                 case EnumDeclarationSyntax en:
-                    List<string>? constants = []; // init list
-                    foreach (var m in en.Members)
-                        constants.Add(m.Identifier.Text);
-                    // save enum data
+                    var constants = en.Members.Select(t => t.Identifier.Text).ToList();
                     _data_enums?.Add(en.Identifier.Text, constants);
                     break;
             }
