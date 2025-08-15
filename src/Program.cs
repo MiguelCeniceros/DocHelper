@@ -63,10 +63,14 @@ class ParserDoc {
                     foreach (var v in properties) {
                         list_properties.Add(v.ToString());
                     }
+
+                    // ------------------- events ------------------- //
                     
-                    // var eventFields = cls.Members.OfType<EventFieldDeclarationSyntax>();
-                    // var eventProps  = cls.Members.OfType<EventDeclarationSyntax>();
-                    
+                    var eventfields = cls.Members.OfType<EventFieldDeclarationSyntax>();
+                    List<string>? list_eventfields = [];
+                    foreach (var v in eventfields) {
+                        list_eventfields.Add(v.ToString());
+                    }
 
                     // ------------------ methods ------------------ //
                     
@@ -81,7 +85,6 @@ class ParserDoc {
                             .WithConstraintClauses(default)
                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                             .NormalizeWhitespace();
-                        // Console.WriteLine(declaration_only.ToFullString());
                         list_methods?.Add(declaration_only.ToFullString());
                     }
 
@@ -90,6 +93,7 @@ class ParserDoc {
                     DataClass data_class = new DataClass {
                         Fields = list_fields,
                         Properties = list_properties,
+                        Events = list_eventfields,
                         Methods = list_methods
                     };
                     // save class data
