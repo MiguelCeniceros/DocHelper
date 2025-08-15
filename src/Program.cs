@@ -41,19 +41,35 @@ class ParserDoc {
         // check class nodes        
         foreach (var node in root.DescendantNodes()) {
             switch (node) {
+
+                // --------------------------------------------------------------------------------
+                // classes
+                // --------------------------------------------------------------------------------
+                
                 case ClassDeclarationSyntax cls:
-                    // Console.WriteLine($"class found: {cls.Identifier.Text}");
+
+                    // ------------------- fields ------------------- //
+                    
                     var fields = cls.Members.OfType<FieldDeclarationSyntax>();
-                    var properties = cls.Members.OfType<PropertyDeclarationSyntax>();
-                    var eventFields = cls.Members.OfType<EventFieldDeclarationSyntax>();
-                    var eventProps  = cls.Members.OfType<EventDeclarationSyntax>();
-                    var methods = cls.Members.OfType<MethodDeclarationSyntax>();
+                    List<string>? list_fields = [];
+                    foreach (var v in fields) {
+                        list_fields.Add(v.ToString());
+                    }
+
+                    // ----------------- properties ----------------- //
+                        
+                    
+                    // var properties = cls.Members.OfType<PropertyDeclarationSyntax>();
+                    // var eventFields = cls.Members.OfType<EventFieldDeclarationSyntax>();
+                    // var eventProps  = cls.Members.OfType<EventDeclarationSyntax>();
+                    
 
                     // ------------------ methods ------------------ //
-
+                    
+                    var methods = cls.Members.OfType<MethodDeclarationSyntax>();
                     List<string>? list_methods = [];
-                    foreach (var m in methods) {
-                        var declaration_only = m
+                    foreach (var v in methods) {
+                        var declaration_only = v
                             .WithAttributeLists(default)
                             .WithLeadingTrivia(SyntaxTriviaList.Empty)
                             .WithBody(null)
@@ -61,18 +77,23 @@ class ParserDoc {
                             .WithConstraintClauses(default)
                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                             .NormalizeWhitespace();
-                        Console.WriteLine(declaration_only.ToFullString());
+                        // Console.WriteLine(declaration_only.ToFullString());
                         list_methods?.Add(declaration_only.ToFullString());
                     }
 
                     // --------------- add class data --------------- //
 
                     DataClass data_class = new DataClass {
+                        Fields = list_fields,
                         Methods = list_methods
                     };
                     _data_classes?.Add(cls.Identifier.Text, data_class);
                     
                     break;
+
+                // --------------------------------------------------------------------------------
+                // enums
+                // --------------------------------------------------------------------------------
 
                 case EnumDeclarationSyntax en:
                     List<string>? constants = []; // init list
