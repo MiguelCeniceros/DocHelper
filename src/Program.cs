@@ -57,9 +57,13 @@ class ParserDoc {
                     }
 
                     // ----------------- properties ----------------- //
-                        
+                                            
+                    var properties = cls.Members.OfType<PropertyDeclarationSyntax>();
+                    List<string>? list_properties = [];
+                    foreach (var v in properties) {
+                        list_properties.Add(v.ToString());
+                    }
                     
-                    // var properties = cls.Members.OfType<PropertyDeclarationSyntax>();
                     // var eventFields = cls.Members.OfType<EventFieldDeclarationSyntax>();
                     // var eventProps  = cls.Members.OfType<EventDeclarationSyntax>();
                     
@@ -85,10 +89,11 @@ class ParserDoc {
 
                     DataClass data_class = new DataClass {
                         Fields = list_fields,
+                        Properties = list_properties,
                         Methods = list_methods
                     };
+                    // save class data
                     _data_classes?.Add(cls.Identifier.Text, data_class);
-                    
                     break;
 
                 // --------------------------------------------------------------------------------
