@@ -23,7 +23,6 @@ class ParserDoc {
         ParserDoc parserDoc = new ParserDoc();
 
         foreach(var a in args) {
-            Console.WriteLine(a);
             parserDoc.AnalyzeFile(a);
         }
 
@@ -39,16 +38,23 @@ class ParserDoc {
         var tree = CSharpSyntaxTree.ParseText(code);
         var root = tree.GetRoot();
 
-        // check class nodes
-        foreach (var node in root.DescendantNodes().OfType<ClassDeclarationSyntax>()) {
-            Console.WriteLine($"class found: {node.Identifier.Text}");
+        // check class nodes        
+        foreach (var node in root.DescendantNodes()) {
+            switch (node) {
+                case ClassDeclarationSyntax cls:
+                    // Console.WriteLine($"class found: {cls.Identifier.Text}");
+                    break;
+
+                case EnumDeclarationSyntax en:
+                    List<string>? constants = []; // init list
+                    foreach (var m in en.Members)
+                        constants.Add(m.Identifier.Text);
+                    // save enum data
+                    _data_enums.Add(en.Identifier.Text, constants);
+                    break;
+            }
         }
-
-        
-        
-        
     }
-
 }
 
 class DataClass {
