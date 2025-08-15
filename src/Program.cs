@@ -43,6 +43,35 @@ class ParserDoc {
             switch (node) {
                 case ClassDeclarationSyntax cls:
                     // Console.WriteLine($"class found: {cls.Identifier.Text}");
+                    var fields = cls.Members.OfType<FieldDeclarationSyntax>();
+                    var properties = cls.Members.OfType<PropertyDeclarationSyntax>();
+                    var eventFields = cls.Members.OfType<EventFieldDeclarationSyntax>();
+                    var eventProps  = cls.Members.OfType<EventDeclarationSyntax>();
+                    var methods = cls.Members.OfType<MethodDeclarationSyntax>();
+
+                    // ------------------ methods ------------------ //
+
+                    List<string>? list_methods = [];
+                    foreach (var m in methods) {
+                        var declaration_only = m
+                            .WithAttributeLists(default)
+                            .WithLeadingTrivia(SyntaxTriviaList.Empty)
+                            .WithBody(null)
+                            .WithExpressionBody(null)
+                            .WithConstraintClauses(default)
+                            .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                            .NormalizeWhitespace();
+                        Console.WriteLine(declaration_only.ToFullString());
+                        list_methods?.Add(declaration_only.ToFullString());
+                    }
+
+                    // --------------- add class data --------------- //
+
+                    DataClass data_class = new DataClass {
+                        Methods = list_methods
+                    };
+                    _data_classes?.Add(cls.Identifier.Text, data_class);
+                    
                     break;
 
                 case EnumDeclarationSyntax en:
@@ -50,7 +79,7 @@ class ParserDoc {
                     foreach (var m in en.Members)
                         constants.Add(m.Identifier.Text);
                     // save enum data
-                    _data_enums.Add(en.Identifier.Text, constants);
+                    _data_enums?.Add(en.Identifier.Text, constants);
                     break;
             }
         }
