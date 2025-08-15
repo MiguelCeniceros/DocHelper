@@ -5,26 +5,26 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-// DocHelper's purpose is to read files and produce an image diagram of the class hiararchies
+// ParserDoc's purpose is to read files and produce an image diagram of the class hiararchies
 
-class DocHelper {
+class ParserDoc {
 
     // classes: we want to save their name (key), their parents, fields, properties, events, and methods
     Dictionary<string, DataClass>? _data_classes = new();
     // enums: we want to save their name (key) and name of its constants
     Dictionary<string, List<string>?>? _data_enums = new();
 
-    DocHelper() {
+    ParserDoc() {
 
     }
 
     static void Main(string[] args) {
 
-        DocHelper docHelper = new DocHelper();
+        ParserDoc parserDoc = new ParserDoc();
 
         foreach(var a in args) {
             Console.WriteLine(a);
-            docHelper.AnalyzeFile(a);
+            parserDoc.AnalyzeFile(a);
         }
 
     }
